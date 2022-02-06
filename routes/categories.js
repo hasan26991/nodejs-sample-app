@@ -1,23 +1,29 @@
 const router = require("express").Router();
-const Category = require("../models/Category");
+const CategoryService = require('../services/cat.service');
+const categoryService = new CategoryService();
+const validateDto = require("../middleware/validate-dto");
+const postCatSchema = require("../schema/postCat");
+const getCatSchema = require("../schema/getCat");
 
-router.post('/', async (req, res) => {
-    const newCat = new Category(req.body);
+
+
+router.post('/', validateDto(postCatSchema), async (req, res) => {
+
     try {
-        const savedCat = await newCat.save();
-        res.status(200).json(savedCat);
-    } catch (err) {
-        res.status(200).json(err);
+        const result = await categoryService.create(req.body);
+        res.status(200).json(result);
+    } catch (e) {
+        res.status(400).json(e.message);
     }
 });
 
-router.get('/', async (req, res) => {
+router.get('/', validateDto(getCatSchema), async (req, res) => {
 
     try {
-        const cats = await Category.find();
-        res.status(200).json(cats);
-    } catch (err) {
-        res.status(200).json(err);
+        const result = await categoryService.get();
+        res.status(200).json(result);
+    } catch (e) {
+        res.status(400).json(e.message);
     }
 });
 
